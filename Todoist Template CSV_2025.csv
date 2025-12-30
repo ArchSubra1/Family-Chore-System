@@ -1,0 +1,95 @@
+TYPE,CONTENT,DESCRIPTION,PRIORITY,INDENT,AUTHOR,RESPONSIBLE,DATE,DATE_LANG,TIMEZONE,DURATION,DURATION_UNIT,DEADLINE,DEADLINE_LANG
+meta,view_style=board,,,,,,,,,,,,
+section,Daily,,,,,,,,,,,,
+task,Kitchen-Morning Cook,Breakfast for kids,1,1,,Parent1,every day @ 6:00,en,,30,minute,,en
+task,Kitchen-Morning Cook,School and Work Lunch                 ,1,1,,Parent1,every day @ 6:00,en,,60,minute,,en
+task,Kitchen-Evening Cook,Home Lunch                 ,1,1,,Parent2,every day @ 15:00,en,,30,minute,,en
+task,Kitchen-Dnner Cook,Dinner        ,1,1,,Parent2,every day @ 18:00,en,,60,minute,,en
+task,Kitchen-Counter Clean,Kitchen-Counter Clean,,,,Parent1,every day @ 20:00,en,,15,minute,,en
+task,Kitchen-Load Dishwasher,Kitchen-Load Dishwasher,,,,Parent2,every day @ 20:00,en,,15,minute,,en
+task,Kitchen-Unload Dishwasher,Kitchen-Unload Dishwasher,,,,Kid2,every day @ 20:00,en,,15,minute,,en
+task,Kitchen-SnacksAndDrinks,Kitchen-SnacksAndDrinks,,,,Kid1,every day @ 20:00,en,,15,minute,,en
+task,TidyUp-SchoolBagGetItready-Sathvika,TidyUp-SchoolBagGetItready-Sathvika,,,,Kid2,every day @ 20:00,en,,15,minute,,en
+task,TidyUp-SchoolBagGetItready-Sreegan,TidyUp-SchoolBagGetItready-Sreegan,,,,Kid1,every day @ 20:00,en,,15,minute,,en
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+section,Weekly,,,,,,,,,,,,
+task,Trash-Kitchen,Trash-Kitchen,1,1,,Parent2,every thursady,en,,30,minute,,en
+task,"WashBottle,Bags-Sathvika","WashBottle,Clear up sports bag , clean lunchBag",1,1,,Kid1,every   Friday,en,,30,minute,,en
+task,"WashBottle,Bags-Sreegan","WashBottle,Clear up sports bag , clean lunchBag",1,1,,Kid2,every   Friday,en,,30,minute,,en
+task,Laundry-All,Laundry-All,,,,Parent1,every Saturday,en,,30,minute,,en
+task,Laundry-PersonalFold-Sreegan,Laundry-PersonalFold,,,,Kid2,every Saturday,en,,30,minute,,en
+task,Laundry-PersonalFold-Sathvika,Laundry-PersonalFold,,,,Parent1,every Saturday,en,,30,minute,,en
+task,Laundry-PersonalFold,Laundry-PersonalFold,,,,Kid1,every Saturday,en,,30,minute,,en
+task,Laundry-PersonalHang,Laundry-PersonalHang,,,,Parent1,every Saturday,en,,30,minute,,en
+task,Bathroom-Personal-Sreegan,Bathroom-Personal-Sreegan,,,,Kid1,every 2 weeks  Saturday,en,,30,minute,,en
+task,Bathroom-Personal-Sathvika,Bathroom-Personal-Sathvika,,,,Kid2,every  2 weeks  Saturday,en,,30,minute,,en
+task,Bathroom-MasterandCommon,Bathroom-MasterandCommon,,,,Parent2,every  2 weeks  Saturday,en,,30,minute,,en
+task,Vaccum-PersonalRoom-Sathvika,Vaccum-PersonalRoom-Sathvika,,,,Kid1,every   Saturday,,,,,,
+task,Vaccum-PersonalRoom-Sreegan,Vaccum-PersonalRoom-Sreegan,,,,Kid2,every   Saturday,,,,,,
+task,Vaccum-UpstrairsCommon,Vaccum-UpstrairsCommon,,,,Parent1,every   Saturday,,,,,,
+task,Vaccum-DownstairsCommon,Vaccum-DownstairsCommon,,,,Parent1,every   Friday,,,,,,
+task,Vaccum-Stairs,Vaccum-Stairs,,,,Parent1,every  2 weeks  Saturday,,,,,,
+task,Dust-Dining,Dust-Dining,,,,Kid1,every   Friday,,,,,,
+task,Dust-LivingHall,Dust-LivingHall,,,,Kid2,every   Friday,,,,,,
+task,Kitchen-AppliancesClean,Kitchen-AppliancesClean,,,,Parent1,every   Friday,en,,15,minute,,en
+task,Kitchen-WeeklyMealPrep,Kitchen-WeeklyMealPrep,1,1,,Parent1,every   Friday,en,,60,minute,,en
+task,Kitchen-Refill ,Kitchen-Refill ,1,1,,Parent2,every   Friday,en,,60,minute,,en
+task,Admin-ReviewBillsAndPay,Admin-ReviewBillsAndPay,,,,Parent2,,,,,,,
+task,Admin-WeeklyMealPlan,Admin-WeeklyMealPlan,,,,Parent1,,,,,,,
+task,Shopping-Grocery-Refill,"Costco,Walmart,Target,IndianStore,Etc",,,,,every  2 weeks  Saturday,,,,,,
+task,Shopping-Others,Shopping-Others,,,,,every  2 weeks  Saturday,,,,,,
+task,Shopping-Returns,Shopping-Returns,,,,,every  2 weeks  Saturday,,,,,,
+task,Mails Pick,Mails Pick,,,,Kid1,every   Friday,,,,,,
+task,Admin-Mails Review,Admin-Mails Review,,,,Parent2,every   Friday,,,,,,
+task,water indoor plants,water indoor plants,,,,Parent1,,,,,,,
+,,,,,,,,,,,,,
+section,monthly,,,,,,,,,,,,
+task,Admin-ReviewWealth,Admin-ReviewWealth,,,,Parent1,,,,,,,
+task,Sathvika- Declutter room,,,,,Kid1,Every 3 months on Saturday,,,,,,
+task,Sreegan- Declutter room,,,,,Kid2,Every 3 months on Saturday,,,,,,
+task,Pantry Refill,,,,,Parent1,Every 3 months on Saturday,,,,,,
+task,Auto-Oil-Mainatanence,,,,,Parent2,,,,,,,
+task,Auto-Wash-Car1,,,,,Parent2,,,,,,,
+task,Auto-Wash-Car2,,,,,Parent2,,,,,,,
+task,Auto-TirePump-Car1,,,,,Parent2,,,,,,,
+task,Auto-TirePump-Car2,,,,,Parent2,,,,,,,
+task,Garage-Vaccum,,,,,Parent1,,,,,,,
+task,FrontAndBackPorch-Vaccum,,,,,Parent1,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+section,Seasonal,,,,,,,,,,,,
+task,"WaterPlants, Harvest","WaterPlants, Harvest",,,,,everyday Mar to Oct,en,,30,minute,,en
+task,Lawn- WeedControl,,,,,Parent2,,,,,,,
+task,Lawn- Mowing,,,,,Parent2,every  2 weeks  Saturday,,,,,,
+task,Lawn-Edging,,,,,Kid2,every  2 weeks  Saturday,,,,,,
+task,Yard- Mulching,,,,,Parent2,,,,,,,
+task,Lawn- Fertilizer,,,,,Parent2,,,,,,,
+task,Spring-SeedingAndPlanting,,,,,Parent2,,,,,,,
+task,Pull out weeds from Veg Garden,,,,,Parent2,,,,,,,
+task,Trim  bushes and trees,,,,,Parent2,every  2 weeks  Saturday,,,,,,
+task,soil,,,,,Parent2,every  2 weeks  Saturday,,,,,,
+,,,,,,,,,,,,,
+section,HouseMaintance,,,,,,,,,,,,
+task,Paint heavy used area,Paint heavy used area,,,,,,,,,,,
+task,Fix broken items at home,"Fix broken items ( Guest room side table , hall wall hole)",,,,,,,,,,,
+task,Deep clean-Appliances,Deep clean-Appliances,,,,,,,,,,,
+task,Fix security set up,,,,,,,,,,,,
+task,Home Automation,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+section,Yearly,,,,,,,,,,,,
+task,Admin-DigitalizeAllDocuments,Admin-DigitalizeAllDocuments,,,,,,,,,,,
+task,Admin-Arrange the paper documents and keep safes,Admin-Arrange the paper documents and keep safes,,,,,,,,,,,
+task,Clean up heavy use doors and basewood,Clean up heavy use doors and basewood,,,,,,,,,,,
+task,vacation/trip planning,,,,,,,,,,,,
+task,"donate sell unused cloths, items from your room- Everyone","donate sell unused cloths, items from your room",,,,Kid1,,,,,,,
+task,Clean up phone data/App/outer-Everyone,,,,,Kid1,,,,,,,
+task,Journal your  yearly -Everyone,,,,,Kid1,,,,,,,
+,,,,,,,,,,,,,
+section,SportsAndEnrichment,,,,,,,,,,,,
+task,drive to Sport1,,,,,,,,,,,,
+task,drive to Sport2,,,,,,,,,,,,
+task,Admin-FindEnrichmentClsss,,,,,,,,,,,,
+task,ReviewKidsAcademic,,,,,,,,,,,,
