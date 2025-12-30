@@ -1,0 +1,367 @@
+// Todoist API - Fetch Completed Tasks (Google Apps Script)
+// You'll need your API token from: https://todoist.com/app/settings/integrations/developer
+
+// Store your API token in Script Properties for security
+// Go to: Project Settings > Script Properties > Add Property
+// Key: TODOIST_API_TOKEN, Value: your_token_here
+
+var API_BASE_URL = 'https://api.todoist.com/sync/v9';
+
+/**
+ * Get API token from Script Properties
+ */
+function getApiToken() {
+  var token = PropertiesService.getScriptProperties().getProperty('TODOIST_API_TOKEN');
+  if (!token) {
+    throw new Error('API token not found. Please add TODOIST_API_TOKEN to Script Properties.');
+  }
+  return token;
+}
+
+/**
+ * Get all sections from Todoist
+ * @returns {Object} Object mapping section IDs to section names
+ */
+function getAllSections() {
+  try {
+    var token = getApiToken();
+    var url = 'https://api.todoist.com/rest/v2/sections';
+    
+    var options = {
+      method: 'get',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      muteHttpExceptions: true
+    };
+    
+    var response = UrlFetchApp.fetch(url, options);
+    var responseCode = response.getResponseCode();
+    
+    if (responseCode !== 200) {
+      throw new Error('HTTP error! Status: ' + responseCode);
+    }
+    
+    var sections = JSON.parse(response.getContentText());
+    
+    // Create a map of section ID to section name
+    var sectionMap = {};
+    sections.forEach(function(section) {
+      sectionMap[section.id] = section.name;
+    });
+    
+    return sectionMap;
+    
+  } catch (error) {
+    Logger.log('Error fetching sections: ' + error.message);
+    return {};
+  }
+}
+
+/**
+ * Get all collaborators (users) for a specific project
+ * @param {string} projectId - Optional project ID to filter collaborators
+ * @returns {Object} Object mapping user IDs to user names
+ */
+function getAllCollaborators(projectId) {
+  try {
+    var token = getApiToken();
+    
+    // If project ID is provided, get project-specific collaborators
+    if (projectId) {
+      var url = 'https://api.todoist.com/rest/v2/projects/' + projectId + '/collaborators';
+      
+      var options = {
+        method: 'get',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        muteHttpExceptions: true
+      };
+      
+      var response = UrlFetchApp.fetch(url, options);
+      var responseCode = response.getResponseCode();
+      
+      if (responseCode !== 200) {
+        Logger.log('Could not fetch project collaborators: ' + responseCode);
+        // Fall back to sync API
+        return getAllCollaboratorsSync();
+      }
+      
+      var collaborators = JSON.parse(response.getContentText());
+      
+      // Create a map of user ID to user name
+      var userMap = {};
+      collaborators.forEach(function(collab) {
+        userMap[collab.id] = collab.name || collab.email || 'User ' + collab.id;
+      });
+      
+      return userMap;
+    }
+    
+    // Otherwise get all collaborators using sync API
+    return getAllCollaboratorsSync();
+    
+  } catch (error) {
+    Logger.log('Error fetching collaborators: ' + error.message);
+    return {};
+  }
+}
+
+/**
+ * Get all collaborators using Sync API
+ * @returns {Object} Object mapping user IDs to user names
+ * This is mainly a fail back for getAllCollaborators(projectId) method
+ */
+function getAllCollaboratorsSync() {
+  try {
+    var token = getApiToken();
+    var url = 'https://api.todoist.com/sync/v9/sync';
+    
+    var payload = {
+      sync_token: '*',
+      resource_types: '["collaborators"]'
+    };
+    
+    var options = {
+      method: 'post',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+    
+    var response = UrlFetchApp.fetch(url, options);
+    var responseCode = response.getResponseCode();
+    
+    if (responseCode !== 200) {
+      Logger.log('Could not fetch collaborators: ' + responseCode);
+      return {};
+    }
+    
+    var data = JSON.parse(response.getContentText());
+    var collaborators = data.collaborators || [];
+    
+    // Create a map of user ID to user name
+    var userMap = {};
+    collaborators.forEach(function(collab) {
+      userMap[collab.id] = collab.full_name || collab.email || 'User ' + collab.id;
+    });
+    
+    return userMap;
+    
+  } catch (error) {
+    Logger.log('Error fetching collaborators: ' + error.message);
+    return {};
+  }
+}
+
+/**
+ * Helper function to calculate reward points based on section names
+ * @param {Object} task - The task object
+ * @param {Object} sectionsMap - Map of section IDs to section names
+ * @returns {number} Reward points for the task
+ */
+function calculateRewardPoints(task, sectionsMap) {
+  // Reward mapping based on section names
+  var rewardMap = {
+    'Daily': 5,
+    'Weekly': 5,
+    'Monthly': 10,
+    'Yearly': 10,
+    'Seasonal': 15,
+    'HouseMaintenance': 15
+  };
+  
+  // Default reward if no matching section
+  var totalReward = 0;
+  
+  // Check if task has a section
+  if (task.section_id && sectionsMap[task.section_id]) {
+    var sectionName = sectionsMap[task.section_id];
+    
+    // Check section name against reward map (case-insensitive)
+    for (var rewardSection in rewardMap) {
+      if (sectionName.toLowerCase() === rewardSection.toLowerCase()) {
+        totalReward = rewardMap[rewardSection];
+        break;
+      }
+    }
+  }
+  
+  return totalReward;
+}
+
+/**
+ * Get completed tasks from the last 7 days for a specific project
+ */
+function getTasksFromLastWeek(projectId) {
+  var today = new Date();
+  var lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  
+  var since = Utilities.formatDate(lastWeek, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  var until = Utilities.formatDate(today, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  
+  var options = { 
+    limit: 200,
+    since: since,
+    until: until,
+    projectId: projectId
+  };
+ 
+  var tasks = getCompletedTasks(options);
+  
+  Logger.log('Completed tasks in the last week: ' + tasks.length);
+  return tasks;
+}
+
+/**
+ * Fetch completed tasks from Todoist
+ * @param {Object} options - Optional parameters
+ * @param {number} options.limit - Maximum number of items to return (default: 50, max: 200)
+ * @param {string} options.since - Return items completed after this date (YYYY-MM-DD format)
+ * @param {string} options.until - Return items completed before this date (YYYY-MM-DD format)
+ * @param {string} options.projectId - Filter by specific project ID
+ * @returns {Array} Array of completed tasks
+ */
+function getCompletedTasks(options) {
+  options = options || {};
+  var limit = options.limit || 50;
+  var since = options.since || '';
+  var until = options.until || '';
+  var projectId = options.projectId || '';
+  
+  try {
+    var token = getApiToken();
+    
+    // Build URL with parameters
+    var url = API_BASE_URL + '/completed/get_all?limit=' + limit;
+    if (since) url += '&since=' + since;
+    if (until) url += '&until=' + until;
+    if (projectId) url += '&project_id=' + projectId;
+    
+    var fetchOptions = {
+      method: 'get',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      muteHttpExceptions: true
+    };
+    
+    var response = UrlFetchApp.fetch(url, fetchOptions);
+    Logger.log('URL ' + url + ' with projectid.');
+    var responseCode = response.getResponseCode();
+    
+    if (responseCode !== 200) {
+      throw new Error('HTTP error! Status: ' + responseCode + ' - ' + response.getContentText());
+    }
+    
+    var data = JSON.parse(response.getContentText());
+    Logger.log('Successfully pulled ' + data.items.length + ' completed tasks.');
+    return data.items || [];
+    
+  } catch (error) {
+    Logger.log('Error fetching completed tasks: ' + error.message);
+    throw error;
+  }
+}
+
+/**
+ * Import last week's tasks to sheet
+ */
+function importLastWeekTasks() {
+  try {
+    // If you want to hardcode a specific project ID, replace null with the project ID string
+    var HARDCODED_PROJECT_ID = XXXXXXXXX; // Set to your project ID or leave as null
+    var usersMap = getAllCollaborators(HARDCODED_PROJECT_ID);
+    var tasks = getTasksFromLastWeek(HARDCODED_PROJECT_ID);   
+    
+    if (tasks.length === 0) {
+      SpreadsheetApp.getUi().alert('No tasks found in the last week.');
+      return;
+    }
+    
+    // Get sections map
+    var sectionsMap = getAllSections();
+    
+    // Write to sheet
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Last Week Tasks');
+    
+    if (!sheet) {
+      sheet = ss.insertSheet('Last Week Tasks');
+    } else {
+      sheet.clear();
+    }
+    
+    var headers = ['Task ID', 'Task Name', 'Completed On', 'Completed Time', 'Was Overdue', 'Completed By', 'Section Name', 'Project ID', 'Reward Points'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    sheet.getRange(1, 1, 1, headers.length).setBackground('#4285F4');
+    sheet.getRange(1, 1, 1, headers.length).setFontColor('#FFFFFF');
+    
+    var rows = tasks.map(function(task) {
+      var completedDate = new Date(task.completed_at);
+      var taskId = task.task_id || task.id || '';
+      var taskName = task.content || '';
+      var completedOn = Utilities.formatDate(completedDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+      var completedTime = Utilities.formatDate(completedDate, Session.getScriptTimeZone(), 'HH:mm:ss');
+      
+      var wasOverdue = 'No';
+      if (task.due && task.due.date) {
+        var dueDate = new Date(task.due.date);
+        if (completedDate > dueDate) {
+          wasOverdue = 'Yes';
+        }
+      }
+      
+      // Get completed by name instead of ID
+      var userId = task.user_id || task.completed_by_uid;
+      var completedBy = userId ? (usersMap[userId] || 'User ' + userId) : 'N/A';
+      
+      var sectionName = task.section_id ? (sectionsMap[task.section_id] || 'Unknown Section') : 'No Section';
+      var projectId = task.project_id || '';
+      
+      // Calculate reward points based on section
+      var rewardPoints = calculateRewardPoints(task, sectionsMap);
+      
+      return [
+        taskId,
+        taskName,
+        completedOn,
+        completedTime,
+        wasOverdue,
+        completedBy,
+        sectionName,
+        projectId,
+        rewardPoints
+      ];
+    });
+    
+    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+    sheet.autoResizeColumns(1, headers.length);
+    sheet.setFrozenRows(1);
+    
+    // Calculate total rewards
+    var totalRewards = 0;
+    rows.forEach(function(row) {
+      totalRewards += row[8]; // Reward points column
+    });
+    
+    // Add total rewards summary
+    var summaryRow = sheet.getLastRow() + 2;
+    sheet.getRange(summaryRow, 1).setValue('Total Rewards:');
+    sheet.getRange(summaryRow, 1).setFontWeight('bold');
+    sheet.getRange(summaryRow, 2).setValue(totalRewards);
+    sheet.getRange(summaryRow, 2).setFontWeight('bold');
+    sheet.getRange(summaryRow, 2).setBackground('#FFD700'); // Gold color
+    
+    SpreadsheetApp.getUi().alert('Success!', 'Imported ' + tasks.length + ' tasks from last week.\nTotal Rewards: ' + totalRewards + ' points', SpreadsheetApp.getUi().ButtonSet.OK);
+    
+  } catch (error) {
+    SpreadsheetApp.getUi().alert('Error', error.message, SpreadsheetApp.getUi().ButtonSet.OK);
+  }
+}
